@@ -12,5 +12,11 @@
     "start": "lerna run start",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff"
+  },
+  "resolutions": {
+    "styled-components": "^5"
+  },
+  "dependencies": {
+    "@types/styled-components": "^5.1.26"
   }
 }
