@@ -1,5 +1,6 @@
 import styled from "styled-components";
-export const Main = styled.main`
+const whiteSmoke = "#f4f6f7";
+export const ListMainContainer = styled.main`
   background: radial-gradient(50% 123.47% at 50% 50%, #00ff94 0%, #720059 100%),
     linear-gradient(121.28deg, #669600 0%, #ff0000 100%),
     linear-gradient(360deg, #0029ff 0%, #8fff00 100%),
@@ -10,14 +11,38 @@ export const Main = styled.main`
   min-height: 100vh;
 `;
 export const Wrapper = styled.div`
-  width: 50%;
+  width: 70%;
   min-height: auto;
   margin: 0 auto;
   background: #fff;
   border-radius: 5px;
   min-height: 100px;
-  padding: 3rem;
+  /* padding: 3rem; */
+  display: flex;
+  gap: 0.5rem;
 `;
+export const Sidebar = styled.div`
+  /* background: red; */
+  border-right: 2px solid ${whiteSmoke};
+
+  & .user_info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid ${whiteSmoke};
+    padding: 0.8rem;
+  }
+  & .filter-container {
+    margin-top: 1rem;
+    padding: 0.8rem;
+  }
+`;
+
+export const ContentContainer = styled.div`
+  flex: 1;
+  padding: 2rem;
+`;
+
 export const FormContaner = styled.form`
   display: flex;
   gap: 0.5rem;
@@ -28,10 +53,13 @@ export const ListContainer = styled.ul`
   list-style-type: none;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 export const List = styled.li`
-  background: #f4f6f7;
-  padding: 0.5rem;
+  background: ${whiteSmoke};
+  padding: 0.8rem;
   border-radius: 4px;
   display: flex;
   gap: 0.5rem;
