@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../uitls/firebase";
 
@@ -9,27 +16,42 @@ export default function useFetchTasks() {
   const [todos, setTodos] = useState<any>(null);
 
   const { currentUser } = useAuth();
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setTodos(docSnap.data().todos);
-          // setTodos('todos' in docSnap.data() ? docSnap.data().todos : {})
-        } else {
-          setTodos({});
-        }
-      } catch (err) {
-        setError("Failed to load todos");
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchData() {
+    try {
+      const todosCollRef = collection(db, "todos");
+      const res = await getDocs(todosCollRef);
+      const todosRes = res?.docs?.map((doc) => ({
+        data: doc.data(),
+        id: doc.id,
+      }));
+      setTodos(todosRes);
+    } catch (err) {
+      setError("Failed to load todos");
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
+  }
+  const onDataFilter = async (status: string) => {
+    try {
+      const todosRef = collection(db, "todos");
+      let res: any = "";
+      if (status === "all") {
+        res = query(todosRef, where("status", "!=", status));
+      } else {
+        res = query(todosRef, where("status", "==", status));
+      }
+      const querySnapshot = await getDocs(res);
+      const r: any = [];
+      querySnapshot.forEach((doc) => {
+        r.push({ data: doc.data(), id: doc.id });
+      });
+      setTodos(r);
+    } catch (error) {}
+  };
+  useEffect(() => {
     fetchData();
   }, []);
 
-  return { loading, error, todos, setTodos };
+  return { loading, error, todos, setTodos, fetchData, onDataFilter };
 }

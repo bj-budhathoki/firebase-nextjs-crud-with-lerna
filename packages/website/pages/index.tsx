@@ -3,8 +3,8 @@ import {
   EditFilled,
   LoginOutlined,
   PlusOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
+import { async } from "@firebase/util";
 import {
   Avatar,
   Button,
@@ -19,7 +19,14 @@ import {
   Space,
   Typography,
 } from "antd";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  doc,
+  setDoc,
+  collection,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import Head from "next/head";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -41,40 +48,69 @@ import { withProtected } from "./components/ProtectRoute";
 
 function Home() {
   const { logout, currentUser } = useAuth();
+  const [isAdding, setIsAdding] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTask, setNewTask] = useState("");
   const [status, setStatus] = useState("all");
-  const { todos, setTodos, loading, error } = useFetchTasks();
-  console.log("todos", { todos, setTodos, loading, error });
+  const { todos, fetchData, setTodos, loading, error, onDataFilter } =
+    useFetchTasks();
+
   const onTaskAdd = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsAdding(true);
     try {
-      const userRef = doc(db, "users", currentUser?.uid);
-      await setDoc(
-        userRef,
-        {
-          todos: {
-            title: newTask,
-            status: "active",
-          },
-        },
-        { merge: true }
-      );
+      const taskCollRref = collection(db, "todos");
+      addDoc(taskCollRref, {
+        title: newTask,
+        status: "active",
+      });
       setNewTask("");
+      fetchData();
     } catch (error) {
       console.log(error, currentUser);
+    } finally {
+      setIsAdding(false);
     }
   };
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleOk = async () => {
+    setIsDeleting(true);
+    try {
+      const docRef = doc(db, "todos", selectedTask);
+      await deleteDoc(docRef);
+      setSelectedTask(null);
+      setIsModalOpen(false);
+      fetchData();
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const onTaskStatusChange = async (s: string, id: string) => {
+    if (id === "") return;
+    setIsUpdating(true);
+    try {
+      const docRef = doc(db, "todos", id);
+      await updateDoc(docRef, { status: s });
+      setSelectedTask(null);
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -107,7 +143,13 @@ function Home() {
                 </Popover>
               </div>
               <div className="filter-container">
-                <Radio.Group value={status}>
+                <Radio.Group
+                  value={status}
+                  onChange={(e: any) => {
+                    setStatus(e?.target?.value);
+                    onDataFilter(e?.target?.value);
+                  }}
+                >
                   <Space direction="vertical" size="large">
                     <Radio value="all">All</Radio>
                     <Radio value="active">Active</Radio>
@@ -129,45 +171,49 @@ function Home() {
                   size="large"
                   icon={<PlusOutlined />}
                   htmlType="submit"
+                  loading={isAdding}
                 >
                   Add
                 </Button>
               </FormContaner>
               <ListContainer>
-                {[
-                  {
-                    id: 1,
-                    title: "Create todo app",
-                    status: "active",
-                  },
-                  {
-                    id: 2,
-                    title: "Create todo app",
-                    status: "completed",
-                  },
-                ]?.map((todo) => (
+                {todos?.map((todo: any) => (
                   <List key={todo?.id}>
                     <Content>
-                      <Checkbox checked={todo?.status === "completed"} />
+                      <Checkbox
+                        checked={todo?.data?.status === "completed"}
+                        disabled={isUpdating || isDeleting}
+                        onChange={(e: any) => {
+                          const s =
+                            todo?.data?.status === "completed"
+                              ? "active"
+                              : "completed";
+                          onTaskStatusChange(s, todo?.id);
+                        }}
+                      />
                       <Typography.Text
                         strong
-                        delete={todo?.status === "completed"}
+                        delete={todo?.data?.status === "completed"}
                       >
-                        {todo?.title}
+                        {todo?.data?.title}
                       </Typography.Text>
                     </Content>
                     <Actions>
-                      <Button
+                      {/* <Button
                         icon={<EditFilled size={5} />}
                         type="ghost"
                         size="small"
-                      />
+                      /> */}
                       <Button
                         icon={<DeleteFilled size={5} />}
                         type="ghost"
                         size="small"
                         danger
-                        onClick={showModal}
+                        onClick={() => {
+                          setSelectedTask(todo?.id);
+                          showModal();
+                        }}
+                        disabled={isDeleting || isUpdating}
                       />
                     </Actions>
                   </List>
@@ -182,6 +228,7 @@ function Home() {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        confirmLoading={isDeleting}
       >
         <Typography.Text strong>Are you sure??</Typography.Text>
       </Modal>
