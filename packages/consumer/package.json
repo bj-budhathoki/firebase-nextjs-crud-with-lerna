@@ -1,26 +1,26 @@
 {
-  "name": "website",
+  "name": "consumer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p $CONSUMER_PORT",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
+    "@project/shared": "1.0.0",
+    "next": "13.0.2",
+    "next-transpile-modules": "^10.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.8",
-    "antd": "^4.24.1",
     "eslint": "8.27.0",
     "eslint-config-next": "13.0.2",
-    "firebase": "^9.13.0",
-    "next": "13.0.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "styled-components": "^5.3.6",
     "typescript": "4.8.4"
   }
 }

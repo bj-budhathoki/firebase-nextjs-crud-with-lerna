@@ -32,6 +32,17 @@ export const Sidebar = styled.div`
     border-bottom: 2px solid ${whiteSmoke};
     padding: 0.8rem;
   }
+  .user_name_email {
+    strong {
+      text-transform: capitalize;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .email {
+      font-size: small;
+    }
+  }
   & .filter-container {
     margin-top: 1rem;
     padding: 0.8rem;

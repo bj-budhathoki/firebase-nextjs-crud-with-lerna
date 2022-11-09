@@ -6,7 +6,7 @@ import { LoginContainer, LoginFormWrapper } from "../styles/Auth.Styles";
 import { withPublic } from "./components/ProtectRoute";
 
 function Login() {
-  const [isLogingIn, setIsLogingIn] = useState(true);
+  const [isLogingIn, setIsLogingIn] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
   const [values, setValues] = useState<any>({

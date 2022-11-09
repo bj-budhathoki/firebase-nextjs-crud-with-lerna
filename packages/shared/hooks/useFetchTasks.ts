@@ -7,15 +7,12 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useAuth } from "../context/AuthContext";
-import { db } from "../uitls/firebase";
+import { db } from "../utils/firebase";
 
-export default function useFetchTasks() {
+export const useFetchTasks = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [todos, setTodos] = useState<any>(null);
-
-  const { currentUser } = useAuth();
   async function fetchData() {
     try {
       const todosCollRef = collection(db, "todos");
@@ -54,4 +51,4 @@ export default function useFetchTasks() {
   }, []);
 
   return { loading, error, todos, setTodos, fetchData, onDataFilter };
-}
+};

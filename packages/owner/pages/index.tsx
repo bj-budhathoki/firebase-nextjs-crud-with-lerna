@@ -3,6 +3,8 @@ import {
   EditFilled,
   LoginOutlined,
   PlusOutlined,
+  RightOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { async } from "@firebase/util";
 import {
@@ -28,27 +30,28 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import Head from "next/head";
-import Image from "next/image";
+
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import useFetchTasks from "../hooks/useFetchTasks";
-import {
-  ListMainContainer,
-  Actions,
-  Content,
-  ContentContainer,
-  FormContaner,
-  List,
-  ListContainer,
-  Sidebar,
-  Wrapper,
-} from "../styles/List.styles";
-import { db } from "../uitls/firebase";
-import { withProtected } from "./components/ProtectRoute";
 
+import { withProtected } from "./components/ProtectRoute";
+import {
+  MainContainer,
+  Wrapper,
+  Sidebar,
+  FormContaner,
+  Actions,
+  ContentContainer,
+  ListContainer,
+  List,
+  Content,
+  useFetchTasks,
+  FilterByStatus,
+  db,
+  // @ts-ignore
+} from "@project/shared/";
 function Home() {
   const { logout, currentUser } = useAuth();
-  console.log("current user", currentUser);
   const [isAdding, setIsAdding] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -121,11 +124,16 @@ function Home() {
           <meta name="description" content="Firebase crud " />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <ListMainContainer>
+        <MainContainer>
           <Wrapper>
             <Sidebar>
               <div className="user_info">
-                <Avatar size="large" />
+                <Avatar
+                  style={{ backgroundColor: "#87d068" }}
+                  icon={<UserOutlined />}
+                  size="large"
+                />
+
                 <Popover
                   content={
                     <Button icon={<LoginOutlined />} onClick={logout}>
@@ -136,26 +144,19 @@ function Home() {
                   placement="right"
                   title=""
                 >
-                  <div className="user_name_role">
-                    <Typography.Text strong>Bijay Budhathoki</Typography.Text>
-                    <div className="role">admin</div>
+                  <div className="user_name_email">
+                    <Typography.Text strong>
+                      {currentUser?.displayName}
+                      <RightOutlined style={{ fontSize: "10px" }} />
+                    </Typography.Text>
+                    <Typography.Text className="email">
+                      {currentUser?.email}
+                    </Typography.Text>
                   </div>
                 </Popover>
               </div>
               <div className="filter-container">
-                <Radio.Group
-                  value={status}
-                  onChange={(e: any) => {
-                    setStatus(e?.target?.value);
-                    onDataFilter(e?.target?.value);
-                  }}
-                >
-                  <Space direction="vertical" size="large">
-                    <Radio value="all">All</Radio>
-                    <Radio value="active">Active</Radio>
-                    <Radio value="completed">Completed</Radio>
-                  </Space>
-                </Radio.Group>
+                <FilterByStatus onDataFilter={onDataFilter} />
               </div>
             </Sidebar>
             <ContentContainer>
@@ -221,7 +222,7 @@ function Home() {
               </ListContainer>
             </ContentContainer>
           </Wrapper>
-        </ListMainContainer>
+        </MainContainer>
       </div>
       <Modal
         title="Delete Todo"

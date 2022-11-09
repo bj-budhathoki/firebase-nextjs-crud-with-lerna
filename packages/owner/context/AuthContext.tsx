@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from "firebase/auth";
-import { db, auth } from "../uitls/firebase";
+//@ts-ignore
+import { db, auth } from "@project/shared/";
 
 const AuthContext = React.createContext<any>(null);
 
@@ -14,10 +15,9 @@ export const AuthProvider = ({ children }: any) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const userInfo = useRef();
-  const signup = (email: string, password: string, name: string) => {
+  const signup = async (email: string, password: string, name: string) => {
     return createUserWithEmailAndPassword(auth, email, password)
       .then((res) => {
-        console.log("hello users", res, res?.user);
         updateProfile(res?.user, {
           displayName: name || null,
         });

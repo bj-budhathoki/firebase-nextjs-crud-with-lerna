@@ -1,5 +1,5 @@
 import { Alert, Button, Input, Typography } from "antd";
-import { collection, setDoc } from "firebase/firestore";
+
 import Link from "next/link";
 import Router from "next/router";
 
@@ -28,7 +28,8 @@ function SignUp() {
     e.preventDefault();
     setIsRegistering(true);
     try {
-      await signup(values?.email, values.password, values.name);
+      const res = await signup(values?.email, values.password, values.name);
+      console.log(res);
       Router.replace("/");
     } catch (error: any) {
       setError(error?.message || "Fail to register");

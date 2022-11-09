@@ -2,6 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-}
-
-module.exports = nextConfig
+};
+const withTM = require("next-transpile-modules")(["@project/shared"]);
+module.exports = withTM({});
