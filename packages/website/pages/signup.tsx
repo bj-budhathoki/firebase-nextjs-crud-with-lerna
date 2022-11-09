@@ -1,15 +1,19 @@
 import { Alert, Button, Input, Typography } from "antd";
+import { collection, setDoc } from "firebase/firestore";
 import Link from "next/link";
+import Router from "next/router";
+
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { LoginContainer, LoginFormWrapper } from "../styles/Auth.Styles";
 import { withPublic } from "./components/ProtectRoute";
 
-function Login() {
-  const [isLogingIn, setIsLogingIn] = useState(true);
+function SignUp() {
+  const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const [values, setValues] = useState<any>({
+    name: "",
     email: "",
     password: "",
   });
@@ -22,19 +26,20 @@ function Login() {
   };
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLogingIn(true);
+    setIsRegistering(true);
     try {
-      await login(values?.email, values.password);
+      await signup(values?.email, values.password, values.name);
+      Router.replace("/");
     } catch (error: any) {
-      setError("incorrect credentials");
+      setError(error?.message || "Fail to register");
     } finally {
-      setIsLogingIn(true);
+      setIsRegistering(false);
     }
   };
   return (
     <LoginContainer>
       <LoginFormWrapper>
-        <Typography.Title>LOGIN</Typography.Title>
+        <Typography.Title>SIGNUP</Typography.Title>
         {error && (
           <>
             <Alert type="error" message={error} />
@@ -43,6 +48,12 @@ function Login() {
         )}
 
         <form onSubmit={submitHandler}>
+          <Input
+            placeholder="Name"
+            size="large"
+            name="name"
+            onChange={handleOnChange}
+          />
           <Input
             placeholder="Email"
             size="large"
@@ -59,16 +70,15 @@ function Login() {
             type="primary"
             size="large"
             htmlType="submit"
-            loading={isLogingIn}
+            loading={isRegistering}
           >
-            Login
+            Register
           </Button>
           <Typography.Text strong>OR</Typography.Text>
-
-          <Link href="/signup">SignUp</Link>
+          <Link href="/login">Login</Link>
         </form>
       </LoginFormWrapper>
     </LoginContainer>
   );
 }
-export default withPublic(Login);
+export default withPublic(SignUp);

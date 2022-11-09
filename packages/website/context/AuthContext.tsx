@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile,
 } from "firebase/auth";
 import { db, auth } from "../uitls/firebase";
 
@@ -13,10 +14,17 @@ export const AuthProvider = ({ children }: any) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const userInfo = useRef();
-  const signup = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const signup = (email: string, password: string, name: string) => {
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        console.log("hello users", res, res?.user);
+        updateProfile(res?.user, {
+          displayName: name || null,
+        });
+      })
+      .catch((err) => console.log(err));
   };
-  const login = (email: string, password: string) => {
+  const login = (email: string, password: string, name: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
   const logout = () => {
@@ -24,6 +32,7 @@ export const AuthProvider = ({ children }: any) => {
   };
   useEffect(() => {
     const unsubribe = onAuthStateChanged(auth, async (user) => {
+      console.log("users", user);
       setCurrentUser(user);
       setLoading(false);
     });

@@ -48,6 +48,7 @@ import { withProtected } from "./components/ProtectRoute";
 
 function Home() {
   const { logout, currentUser } = useAuth();
+  console.log("current user", currentUser);
   const [isAdding, setIsAdding] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -55,8 +56,7 @@ function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTask, setNewTask] = useState("");
   const [status, setStatus] = useState("all");
-  const { todos, fetchData, setTodos, loading, error, onDataFilter } =
-    useFetchTasks();
+  const { todos, fetchData, onDataFilter } = useFetchTasks();
 
   const onTaskAdd = async (event: React.FormEvent) => {
     event.preventDefault();
