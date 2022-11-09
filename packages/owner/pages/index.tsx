@@ -48,6 +48,7 @@ import {
   useFetchTasks,
   FilterByStatus,
   db,
+  NoData,
   // @ts-ignore
 } from "@project/shared/";
 function Home() {
@@ -58,8 +59,7 @@ function Home() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTask, setNewTask] = useState("");
-  const [status, setStatus] = useState("all");
-  const { todos, fetchData, onDataFilter } = useFetchTasks();
+  const { todos, fetchData, onDataFilter, loading } = useFetchTasks();
 
   const onTaskAdd = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -178,47 +178,54 @@ function Home() {
                 </Button>
               </FormContaner>
               <ListContainer>
-                {todos?.map((todo: any) => (
-                  <List key={todo?.id}>
-                    <Content>
-                      <Checkbox
-                        checked={todo?.data?.status === "completed"}
-                        disabled={isUpdating || isDeleting}
-                        onChange={(e: any) => {
-                          const s =
-                            todo?.data?.status === "completed"
-                              ? "active"
-                              : "completed";
-                          onTaskStatusChange(s, todo?.id);
-                        }}
-                      />
-                      <Typography.Text
-                        strong
-                        delete={todo?.data?.status === "completed"}
-                      >
-                        {todo?.data?.title}
-                      </Typography.Text>
-                    </Content>
-                    <Actions>
-                      {/* <Button
+                {!loading && todos?.length <= 0 ? (
+                  <NoData />
+                ) : (
+                  <>
+                    {" "}
+                    {todos?.map((todo: any) => (
+                      <List key={todo?.id}>
+                        <Content>
+                          <Checkbox
+                            checked={todo?.data?.status === "completed"}
+                            disabled={isUpdating || isDeleting}
+                            onChange={(e: any) => {
+                              const s =
+                                todo?.data?.status === "completed"
+                                  ? "active"
+                                  : "completed";
+                              onTaskStatusChange(s, todo?.id);
+                            }}
+                          />
+                          <Typography.Text
+                            strong
+                            delete={todo?.data?.status === "completed"}
+                          >
+                            {todo?.data?.title}
+                          </Typography.Text>
+                        </Content>
+                        <Actions>
+                          {/* <Button
                         icon={<EditFilled size={5} />}
                         type="ghost"
                         size="small"
                       /> */}
-                      <Button
-                        icon={<DeleteFilled size={5} />}
-                        type="ghost"
-                        size="small"
-                        danger
-                        onClick={() => {
-                          setSelectedTask(todo?.id);
-                          showModal();
-                        }}
-                        disabled={isDeleting || isUpdating}
-                      />
-                    </Actions>
-                  </List>
-                ))}
+                          <Button
+                            icon={<DeleteFilled size={5} />}
+                            type="ghost"
+                            size="small"
+                            danger
+                            onClick={() => {
+                              setSelectedTask(todo?.id);
+                              showModal();
+                            }}
+                            disabled={isDeleting || isUpdating}
+                          />
+                        </Actions>
+                      </List>
+                    ))}
+                  </>
+                )}
               </ListContainer>
             </ContentContainer>
           </Wrapper>

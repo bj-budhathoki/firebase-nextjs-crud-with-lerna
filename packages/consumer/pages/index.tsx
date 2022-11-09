@@ -12,13 +12,20 @@ import {
   Content,
   useFetchTasks,
   FilterByStatus,
+  NoData,
   // @ts-ignore
 } from "@project/shared/";
+import Head from "next/head";
 
 const Home: NextPage = () => {
-  const { todos, onDataFilter } = useFetchTasks();
+  const { todos, onDataFilter, loading } = useFetchTasks();
   return (
     <MainContainer>
+      <Head>
+        <title>CRUD App</title>
+        <meta name="description" content="Firebase crud " />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Wrapper>
         <Sidebar>
           <div className="filter-container">
@@ -28,22 +35,28 @@ const Home: NextPage = () => {
         <ContentContainer>
           <Typography.Title>Todos</Typography.Title>
           <ListContainer>
-            {todos?.map((todo: any) => (
-              <List key={todo?.id}>
-                <Content>
-                  <Checkbox
-                    checked={todo?.data?.status === "completed"}
-                    disabled={true}
-                  />
-                  <Typography.Text
-                    strong
-                    delete={todo?.data?.status === "completed"}
-                  >
-                    {todo?.data?.title}
-                  </Typography.Text>
-                </Content>
-              </List>
-            ))}
+            {!loading && todos?.length <= 0 ? (
+              <NoData />
+            ) : (
+              <>
+                {todos?.map((todo: any) => (
+                  <List key={todo?.id}>
+                    <Content>
+                      <Checkbox
+                        checked={todo?.data?.status === "completed"}
+                        disabled={true}
+                      />
+                      <Typography.Text
+                        strong
+                        delete={todo?.data?.status === "completed"}
+                      >
+                        {todo?.data?.title}
+                      </Typography.Text>
+                    </Content>
+                  </List>
+                ))}
+              </>
+            )}
           </ListContainer>
         </ContentContainer>
       </Wrapper>
