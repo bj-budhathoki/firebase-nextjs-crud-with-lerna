@@ -7,7 +7,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 //@ts-ignore
-import { db, auth } from "@project/shared/";
+import { auth } from "@project/shared/";
 
 const AuthContext = React.createContext<any>(null);
 

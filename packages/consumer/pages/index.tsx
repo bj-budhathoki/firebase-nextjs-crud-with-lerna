@@ -22,7 +22,7 @@ const Home: NextPage = () => {
   return (
     <MainContainer>
       <Head>
-        <title>CRUD App</title>
+        <title>CRUD App-consumer</title>
         <meta name="description" content="Firebase crud " />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -32,6 +32,7 @@ const Home: NextPage = () => {
             <FilterByStatus onDataFilter={onDataFilter} />
           </div>
         </Sidebar>
+
         <ContentContainer>
           <Typography.Title>Todos</Typography.Title>
           <ListContainer>

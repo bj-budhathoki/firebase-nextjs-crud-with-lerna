@@ -1,4 +1,5 @@
 import { Alert, Button, Input, Typography } from "antd";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 import Link from "next/link";
 import Router from "next/router";
@@ -7,7 +8,8 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { LoginContainer, LoginFormWrapper } from "../styles/Auth.Styles";
 import { withPublic } from "./components/ProtectRoute";
-
+// @ts-ignore
+import { auth } from "@project/shared/";
 function SignUp() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
@@ -28,10 +30,19 @@ function SignUp() {
     e.preventDefault();
     setIsRegistering(true);
     try {
-      const res = await signup(values?.email, values.password, values.name);
-      console.log(res);
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        values?.email,
+        values.password
+      );
+      await updateProfile(res?.user, {
+        displayName: values.name || null,
+      });
+      setIsRegistering(false);
+      console.log("res", res);
       Router.replace("/");
     } catch (error: any) {
+      console.log("error", error);
       setError(error?.message || "Fail to register");
     } finally {
       setIsRegistering(false);
